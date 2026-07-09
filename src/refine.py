@@ -2,54 +2,73 @@ import numpy as np
 from templates import template_match
 
 
+def _template_similarity(t1, t2):
+    """Normalized correlation between two templates (flattened)."""
+    a = t1.flatten()
+    b = t2.flatten()
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+
 def iterative_refine(filtered, initial_indices, waveforms, fs,
-                      match_threshold=0.6, top_k=200, max_iterations=10,
-                      growth_limit=1.3):
+                      n_candidates=400, max_iterations=10,
+                      stability_threshold=0.9, anchor_similarity=0.5):
     """
-    Iteratively rebuild a spike template using only the top-K highest-scoring
-    matches each round. Stops and reverts if the match count grows too fast
-    (a sign the template is drifting toward noise rather than converging).
+    Iteratively rebuild a spike template using a fixed-size pool of
+    top-scoring candidates, but ANCHORED to the original seed template:
+    any proposed update that drifts too far from the original (similarity
+    below anchor_similarity) is rejected, and refinement stops there.
     """
     history = []
-    current_waveforms = waveforms[initial_indices]
-    template = current_waveforms.mean(axis=0)
-    best_template = template.copy()
+    original_waveforms = waveforms[initial_indices]
+    original_template = original_waveforms.mean(axis=0)
+    template = original_template.copy()
 
-    prev_n_matches = None
+    prev_times = None
 
     for iteration in range(max_iterations):
-        matched_times, scores = template_match(filtered, template, fs, threshold=match_threshold)
-        n_matches = len(matched_times)
+        _, scores = template_match(filtered, template, fs, threshold=-np.inf)
 
-        print(f"iteration {iteration}: {n_matches} total matches")
+        top_order = np.argsort(scores)[::-1][:n_candidates]
+        top_times = np.sort(top_order)
 
-        # Divergence check: if matches grew too fast, the template is drifting toward noise.
-        # Stop here and keep the PREVIOUS iteration's template as the final answer.
-        if prev_n_matches is not None and n_matches > prev_n_matches * growth_limit:
-            print(f"stopping: match count grew too fast ({prev_n_matches} -> {n_matches}), reverting to previous template")
-            break
+        if prev_times is not None:
+            overlap = len(set(top_times) & set(prev_times))
+            stability = overlap / n_candidates
+        else:
+            stability = 0.0
 
         history.append({
             "iteration": iteration,
             "template": template.copy(),
-            "matched_times": matched_times,
-            "n_matches": n_matches,
+            "selected_times": top_times,
+            "stability": stability,
         })
-        best_template = template.copy()
 
-        match_scores = scores[matched_times]
-        top_order = np.argsort(match_scores)[::-1][:top_k]
-        top_times = matched_times[top_order]
+        print(f"iteration {iteration}: stability={stability:.3f}")
 
+        if stability >= stability_threshold:
+            print(f"converged at iteration {iteration}")
+            break
+
+        # Build the CANDIDATE next template
         window = template.shape[0] // 2
         new_waveforms = []
         for t in top_times:
             if t - window >= 0 and t + window < len(filtered):
                 new_waveforms.append(filtered[t - window : t + window, :])
         new_waveforms = np.array(new_waveforms)
-        new_template = new_waveforms.mean(axis=0)
+        candidate_template = new_waveforms.mean(axis=0)
 
-        prev_n_matches = n_matches
-        template = new_template
+        # Anchor check: does this candidate still resemble the ORIGINAL seed?
+        sim = _template_similarity(candidate_template, original_template)
+        print(f"  similarity to original template: {sim:.3f}")
 
-    return history, best_template
+        if sim < anchor_similarity:
+            print(f"  rejected: drifted too far from original (similarity={sim:.3f} < {anchor_similarity})")
+            print(f"  stopping, keeping template from iteration {iteration}")
+            break
+
+        template = candidate_template
+        prev_times = top_times
+
+    return history

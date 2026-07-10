@@ -1,6 +1,6 @@
 # pulse-sort
 
-A spike sorting pipeline built on in-vivo Neuropixel recordings; extending the basic single-channel pipeline from my [fund-spike-sort](https://github.com/rrajmanna/fund-spike-sort) with multi-channel detection, autoencoder features, and iterations.
+A closed loop spike sorting pipeline built on in-vivo Neuropixel recordings with multi-channel detection, autoencoder features, and recursive iterations. Built to extend the basic single-channel pipeline from my [fund-spike-sort](https://github.com/rrajmanna/fund-spike-sort).
 
 ## Data
 
@@ -8,13 +8,13 @@ This project uses in-vivo data from the [Kampff Lab ground-truth dataset](https:
 
 ## Pipeline
 
-1. **Multi-channel detection**: spikes were detected using a combined signal across 40-channels, which improves sensitivity to the target neuron.
-2. **Multi-channel waveform extraction**: each detected spike is captured as a (time × channel) snippet
+1. **Multi-channel detection**: spikes were detected using a combined signal across 40-channels
+2. **Waveform extraction**: each detected spike is captured as a (time × channel) snippet
 3. **Autoencoder feature learning**: a small autoencoder compressed each waveform snippet into a learned feature vector
 4. **Clustering**: spikes are grouped in the learned feature space (k-means clustering)
 5. **Template construction**: the cluster best matching the ground-truth neuron is averaged into a template.
 6. **Template matching**: the template is correlated against the full recording to find more matching spikes.
-7. **Iterative refinement**: the template is repeatedly redone from more matches, which I used to converge on a more accurate representation of the neuron
+7. **Iterative refinement**: the template is repeatedly rebuilt from its own matches, and fed back into the next round of matching.
 
 ## Installation
 
@@ -28,7 +28,7 @@ pip install -r requirements.txt
 
 ## Usage
 
-Each stage of the pipeline lives in `src/` as an importable module, run step by step in the notebooks under `notebooks/`.
+Each stage of the pipeline is in `src/` as an importable function, run step by step in the notebooks under `notebooks/`.
 
 ### Detection (`src/detection.py`)
 - `bandpass_filter`: isolates the frequency range where spikes are (300-6000 Hz)
@@ -36,7 +36,7 @@ Each stage of the pipeline lives in `src/` as an importable module, run step by 
 - `detect_spikes`: locates spike times using thresholds
 
 ### Waveform extraction (`src/waveforms.py`)
-- `extract_waveforms`: pulls a multi-channel (time × channel) snippet around each detected spike
+- `extract_waveforms`: builds multi-channel (time × channel) snippet around each detected spike
 
 ### Feature learning (`src/autoencoder.py`)
 - `WaveformAutoencoder`: an autoencoder that compresses waveform snippets into a learned feature vector
@@ -53,7 +53,7 @@ Latent dimension (8) was chosen by checking 2-32 dimensions and comparing recons
 ### Iterative refinement (`src/refine.py`)
 - `iterative_refine`: iteratively rebuilds the template from its own best matches
 
-Several refinement methods were implemented (naive rebuild, top-K selection, fixed candidate pool, anchored to seed template). See `src/refine.py` for more; this stage converges but does not improve on single-pass template matching for this dataset (limitation).
+Several refinement methods were tested (naive rebuild, top-K selection, fixed candidate pool, and the final anchored approach kept in the codebase), all of them converged, but none improves on single-pass template matching for this dataset (limitation).
 
 ## Results
 

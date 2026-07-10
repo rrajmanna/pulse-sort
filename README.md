@@ -80,27 +80,6 @@ Precision/recall by pipeline stage:
 
 <img src="figures/final_comparison.png" width="480">
 
-## Project structure
-
-\`\`\`
-pulse-sort/
-├── notebooks/
-│   ├── 01_load_data.ipynb
-│   ├── 02_detect_spikes.ipynb
-│   ├── 03_waveforms.ipynb
-│   ├── 04_autoencoder.ipynb
-│   ├── 05_templates.ipynb
-│   └── 06_refine.ipynb
-├── src/
-│   ├── detection.py
-│   ├── waveforms.py
-│   ├── autoencoder.py
-│   ├── templates.py
-│   └── refine.py
-├── figures/
-└── requirements.txt
-\`\`\`
-
 ## Acknowledgments
 
 Ground-truth data from the [Kampff Lab](http://www.kampff-lab.org/) paired recordings dataset. Built with PyTorch, scikit-learn, NumPy, and SciPy.

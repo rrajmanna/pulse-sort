@@ -4,7 +4,7 @@ A closed loop spike sorting pipeline built on in-vivo Neuropixel recordings whic
 
 ## Data
 
-This project uses in-vivo data from the [Kampff Lab ground-truth dataset](https://github.com/kampff-lab/sc.io) (cell `c37`). This data came from a 384-channel Neuropixel recording, giving 601 ground-truth spikes from a sample cortical neuron.
+In this project I used real in-vivo data from the [Kampff Lab ground-truth dataset](https://github.com/kampff-lab/sc.io) (cell `c37`). This data came from a 384-channel Neuropixel recording, giving 601 ground-truth spikes from a sample cortical neuron.
 
 ## Pipeline
 
@@ -28,7 +28,7 @@ pip install -r requirements.txt
 
 ## Usage
 
-Each stage of the pipeline is in `src/` as an importable function, run step by step in the notebooks under `notebooks/`.
+Each stage of the pipeline is in `src/` as a function, which I ran step by step in the notebooks under `notebooks/`.
 
 ### Detection (`src/detection.py`)
 - `bandpass_filter`: isolates the frequency range where spikes are (300-6000 Hz)
@@ -42,7 +42,7 @@ Each stage of the pipeline is in `src/` as an importable function, run step by s
 - `WaveformAutoencoder`: an autoencoder that compresses waveform snippets into a learned feature vector
 - `train_autoencoder`: trains the autoencoder on extracted waveforms
 
-Latent dimension (8) was chosen by checking 2-32 dimensions and comparing reconstruction loss:
+I chose a latent dimension of 8 after checking 2-32 dimensions and comparing reconstruction loss:
 
 <img src="figures/latent_size.png" width="440">
 
@@ -53,11 +53,11 @@ Latent dimension (8) was chosen by checking 2-32 dimensions and comparing recons
 ### Iterative refinement (`src/refine.py`)
 - `iterative_refine`: iteratively rebuilds the template from its own best matches
 
-Several refinement methods were tested (naive rebuild, top-K selection, fixed candidate pool, and the final anchored approach kept in the codebase), all of them converged, but none improves on single-pass template matching for this dataset (limitation).
+I tested many  refinement methods like naive rebuild, top-K selection, fixed candidate pool, and the final anchored approach which I kept in the code. All of them converged, but none of them improved on single-pass template matching for this dataset (limitation).
 
 ## Results
 
-Autoencoder features outperforms PCA at the same dimensionality:
+Autoencoder features outperformed PCA at the same dimensions:
 
 | Method | Best cluster purity |
 |---|---|
@@ -66,7 +66,7 @@ Autoencoder features outperforms PCA at the same dimensionality:
 
 <img src="figures/clusters.png" width="440">
 
-Spatial template for the isolated neuron:
+Spatial template for the neuron:
 
 <img src="figures/template.png" width="440">
 

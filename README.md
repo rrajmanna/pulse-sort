@@ -1,6 +1,6 @@
 # pulse-sort
 
-A closed loop spike sorting pipeline built on in-vivo Neuropixel recordings with multi-channel detection, autoencoder features, and recursive iterations. Built to extend the basic single-channel pipeline from my [fund-spike-sort](https://github.com/rrajmanna/fund-spike-sort).
+A closed loop spike sorting pipeline built on in-vivo Neuropixel recordings which includes multi-channel detection, an autoencoder, and iterations to make the pipeline close-looped. I built this project to extend my original project with a basic single-channel pipeline ([fund-spike-sort])(https://github.com/rrajmanna/fund-spike-sort).
 
 ## Data
 

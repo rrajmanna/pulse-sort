@@ -8,7 +8,7 @@ In this project I used real in-vivo data from the [Kampff Lab ground-truth datas
 
 ## Pipeline
 
-1. **Multi-channel detection**: spikes were detected using a combined signal across 40-channels
+1. **Multi-channel detection**: spikes were detected using a combined signal across 40 channels
 2. **Waveform extraction**: each detected spike is captured as a (time × channel) snippet
 3. **Autoencoder feature learning**: a small autoencoder compressed each waveform snippet into a learned feature vector
 4. **Clustering**: spikes are grouped in the learned feature space (k-means clustering)

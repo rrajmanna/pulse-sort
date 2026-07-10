@@ -18,13 +18,13 @@ This project uses in-vivo data from the [Kampff Lab ground-truth dataset](https:
 
 ## Installation
 
-\`\`\`bash
+```bash
 git clone git@github.com:rrajmanna/pulse-sort.git
 cd pulse-sort
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-\`\`\`
+```
 
 ## Usage
 

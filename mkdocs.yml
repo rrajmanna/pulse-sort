@@ -1,0 +1,19 @@
+site_name: pulse-sort
+theme:
+  name: material
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+nav:
+  - Home: index.md
+  - API Reference:
+      - Detection: api/detection.md
+      - Waveforms: api/waveforms.md
+      - Autoencoder: api/autoencoder.md
+      - Templates: api/templates.md
+      - Clustering: api/clustering.md
+      - Refinement: api/refine.md
+      - Pipeline: api/pipeline.md
+      - Config: api/config.md

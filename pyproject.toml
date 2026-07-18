@@ -1,0 +1,27 @@
+[project]
+name = "pulse-sort"
+version = "0.1.0"
+description = "A closed-loop spike sorting pipeline with autoencoder feature learning"
+authors = [{name = "Rishi Rajmanna"}]
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "scipy",
+    "scikit-learn",
+    "torch",
+    "matplotlib",
+    "hdbscan",
+    "spikeinterface",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

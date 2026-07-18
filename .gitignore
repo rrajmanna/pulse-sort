@@ -6,3 +6,7 @@ data/raw/
 anaconda_projects/
 __pycache__/
 *.pyc
+dist/
+site/
+pulse_sort_output/
+*.egg-info/
